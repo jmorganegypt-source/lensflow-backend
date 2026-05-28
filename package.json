@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "node test-runner.js",
-    "start": "node test-runner.js"
+    "start": "node test-runner.js",
+    "test": "node test-runner.js"
   },
   "dependencies": {
     "openai": "^4.0.0",
     "node-fetch": "^3.3.2",
     "dotenv": "^16.4.5"
   }
-}            
+}
