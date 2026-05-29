@@ -1,10 +1,9 @@
 import { scrapeListing } from './scraper.js';
-import { generateVideoScript } from './scriptGen.js';
-import { generateSpeechFromScript } from './voiceGen.js';
-import { triggerPresenterVideo } from './presenterGen.js';
-import { renderFinalReel } from './videoComposer.js';
+import { generateScript } from './scriptGen.js';
+import { generateVoiceover } from './voiceGen.js';
+import { generatePresenter } from './presenterGen.js';
+import { composeVideo } from './videoComposer.js';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
 const MAX_RETRIES = 3;
@@ -24,14 +23,12 @@ async function withRetry(fn, name) {
 
 export async function runLensFlowPipeline(listingUrl) {
     console.log(`\n🚀 LensFlow Pipeline Started: ${listingUrl}`);
-
     try {
-        const rawData = await withRetry(() => scrapeListing(listingUrl), "Scrape");
-        const script = await withRetry(() => generateVideoScript(rawData), "Script");
-        const audioUrl = await withRetry(() => generateSpeechFromScript(script), "Voiceover");
-        const presenterUrl = await withRetry(() => triggerPresenterVideo(audioUrl), "Presenter");
-        const finalVideoUrl = await withRetry(() => renderFinalReel(rawData.images || [], presenterUrl, audioUrl), "Final Render");
-
+        const listing = await withRetry(() => scrapeListing(listingUrl), "Scrape");
+        const script = await withRetry(() => generateScript(listing), "Script");
+        const audioUrl = await withRetry(() => generateVoiceover(script), "Voiceover");
+        const presenterUrl = await withRetry(() => generatePresenter(script), "Presenter");
+        const finalVideoUrl = await withRetry(() => composeVideo(presenterUrl, audioUrl, listing), "Final Render");
         console.log(`\n🎉 SUCCESS! Video Ready`);
         return { success: true, videoUrl: finalVideoUrl };
     } catch (error) {
