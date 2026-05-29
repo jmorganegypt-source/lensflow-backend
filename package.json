@@ -4,8 +4,8 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "start": "node --no-warnings test-runner.js",
-    "test": "node --no-warnings test-runner.js"
+    "start": "node server.js",
+    "test": "node test-runner.js"
   },
   "dependencies": {
     "openai": "^4.0.0",
