@@ -1,34 +1,39 @@
 import fetch from 'node-fetch';
 
-export async function generateSpeechFromScript(scriptText) {
-    console.log("🎙️ Generating voiceover...");
+const VOICES = {
+  mia: 'XrExE9yKIg1WjnnlVkGX',   // Ember — Energetic, Confident
+  oliver: 'Nhs8rqFRMVMRnzPDV8Hj' // Ollie — Natural & Relaxed British
+};
 
-    const voiceId = "21m00Tcm4TlvDq8ikWAM";
+export async function generateVoiceover(script, presenter = 'mia') {
+  console.log(`🎤 Generating voiceover with ${presenter}...`);
+  const voiceId = VOICES[presenter] || VOICES.mia;
 
-    for (let attempt = 1; attempt <= 3; attempt++) {
-        try {
-            const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'audio/mpeg',
-                    'xi-api-key': process.env.ELEVENLABS_API_KEY,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    text: scriptText,
-                    model_id: "eleven_monolingual_v1",
-                    voice_settings: { stability: 0.75, similarity_boost: 0.85 }
-                }),
-            });
+  try {
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+      {
+        method: 'POST',
+        headers: {
+          'xi-api-key': process.env.ELEVENLABS_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: script,
+          model_id: 'eleven_monolingual_v1',
+          voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+        })
+      }
+    );
 
-            if (!response.ok) throw new Error("ElevenLabs failed");
+    if (!response.ok) throw new Error(`ElevenLabs error: ${response.status}`);
 
-            console.log("✅ Voiceover generated");
-            return await response.buffer();
-        } catch (err) {
-            console.error(`Voice attempt ${attempt} failed`);
-            if (attempt === 3) throw err;
-            await new Promise(r => setTimeout(r, 1500 * attempt));
-        }
-    }
+    const buffer = await response.buffer();
+    const base64 = buffer.toString('base64');
+    // Return as data URI — swap this for cloud storage upload later
+    return `data:audio/mpeg;base64,${base64}`;
+  } catch (error) {
+    console.error('❌ Voiceover failed:', error.message);
+    return null;
+  }
 }
