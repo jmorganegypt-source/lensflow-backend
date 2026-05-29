@@ -12,5 +12,9 @@
     "dotenv": "^16.4.5",
     "apify": "^2.0.0",
     "apify-client": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
+
