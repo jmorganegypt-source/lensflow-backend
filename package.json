@@ -4,13 +4,15 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "start": "node test-runner.js",
+    "start": "node server.js",
     "test": "node test-runner.js"
   },
   "dependencies": {
     "openai": "^4.0.0",
     "dotenv": "^16.4.5",
-    "apify": "^2.0.0"
+    "node-fetch": "^3.3.2",
+    "apify-client": "^2.0.0",
+    "express": "^4.18.2"
   },
   "engines": {
     "node": ">=18"
