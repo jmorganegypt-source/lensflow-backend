@@ -9,7 +9,7 @@ export async function scrapeListing(url) {
   
   try {
     // If you add a real estate actor to your Apify store later, put its name here!
-    const run = await client.actor('apify/web-scraper').call({
+    const run = await client.actor('abotapi/realestate-au-scraper').call({
       startUrls: [{ url: url }],
     });
 
