@@ -10,6 +10,8 @@
   "dependencies": {
     "openai": "^4.0.0",
     "dotenv": "^16.4.5",
-    "apify-client": "^2.0.0"
+    "apify": "^2.0.0",
+    "apify-client": "^2.0.0",
+    "express": "^4.19.2"
   }
 }
