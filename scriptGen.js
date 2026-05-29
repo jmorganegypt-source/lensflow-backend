@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-export async function generateVideoScript(listing) {
+export async function generateScript(listing) {
     console.log("✍️ Generating script...");
 
     const systemPrompt = `You are a top luxury real estate copywriter. Write a compelling 60-second voiceover script (130-150 words).`;
