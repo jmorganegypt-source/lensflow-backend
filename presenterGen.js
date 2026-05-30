@@ -1,8 +1,7 @@
 import fetch from 'node-fetch';
 
-export async function generatePresenter(script, presenter = 'mia') {
+export async function generatePresenter(script, audioUrl, presenter = 'mia') {
   console.log(`🎥 Generating presenter video with HeyGen (${presenter})...`);
-
   try {
     const createRes = await fetch('https://api.heygen.com/v2/video/generate', {
       method: 'POST',
@@ -18,26 +17,20 @@ export async function generatePresenter(script, presenter = 'mia') {
             avatar_style: 'normal'
           },
           voice: {
-            type: 'text',
-            input_text: script,
-            voice_id: presenter === 'oliver'
-              ? 'en-AU-WilliamNeural'
-              : 'en-AU-NatashaNeural'
+            type: 'audio',
+            audio_url: audioUrl
           }
         }],
         dimension: { width: 1080, height: 1920 }
       })
     });
-
     if (!createRes.ok) {
       const err = await createRes.text();
       throw new Error(`HeyGen create error: ${createRes.status} - ${err}`);
     }
-
     const { data } = await createRes.json();
     const videoId = data.video_id;
     console.log(`⏳ HeyGen video ID: ${videoId}`);
-
     for (let i = 0; i < 30; i++) {
       await new Promise(r => setTimeout(r, 5000));
       const pollRes = await fetch(`https://api.heygen.com/v1/video_status.get?video_id=${videoId}`, {
