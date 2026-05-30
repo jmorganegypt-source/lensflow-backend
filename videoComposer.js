@@ -3,12 +3,14 @@ import fetch from 'node-fetch';
 export async function composeVideo(presenterUrl, voiceUrl, listing) {
   console.log('🎬 Composing final video with Shotstack...');
 
+  const BASE_URL = 'https://api.shotstack.io/edit/v1';
+
   try {
     const timeline = {
       tracks: [
         {
           clips: [{
-            asset: { type: 'video', src: presenterUrl },
+            asset: { type: 'video', src: presenterUrl || 'https://shotstack-assets.s3.amazonaws.com/footage/earth.mp4' },
             start: 0, length: 28,
             position: 'center'
           }]
@@ -17,7 +19,7 @@ export async function composeVideo(presenterUrl, voiceUrl, listing) {
           clips: [{
             asset: {
               type: 'title',
-              text: listing.title,
+              text: listing.title || 'Luxury Property',
               style: 'minimal',
               color: '#ffffff',
               size: 'medium'
@@ -30,7 +32,7 @@ export async function composeVideo(presenterUrl, voiceUrl, listing) {
           clips: [{
             asset: {
               type: 'title',
-              text: `${listing.price} · ${listing.address}`,
+              text: `${listing.price || ''} · ${listing.address || ''}`,
               style: 'minimal',
               color: '#C99A2E',
               size: 'small'
@@ -42,7 +44,7 @@ export async function composeVideo(presenterUrl, voiceUrl, listing) {
       ]
     };
 
-    const renderRes = await fetch('https://api.shotstack.io/v1/render', {
+    const renderRes = await fetch(`${BASE_URL}/render`, {
       method: 'POST',
       headers: {
         'x-api-key': process.env.SHOTSTACK_API_KEY,
@@ -54,13 +56,17 @@ export async function composeVideo(presenterUrl, voiceUrl, listing) {
       })
     });
 
-    if (!renderRes.ok) throw new Error(`Shotstack error: ${renderRes.status}`);
-    const { response: { id } } = await renderRes.json();
+    if (!renderRes.ok) {
+      const err = await renderRes.text();
+      throw new Error(`Shotstack error: ${renderRes.status} - ${err}`);
+    }
 
-    // Poll for completion
+    const { response: { id } } = await renderRes.json();
+    console.log(`⏳ Shotstack render ID: ${id}`);
+
     for (let i = 0; i < 30; i++) {
       await new Promise(r => setTimeout(r, 5000));
-      const pollRes = await fetch(`https://api.shotstack.io/v1/render/${id}`, {
+      const pollRes = await fetch(`${BASE_URL}/render/${id}`, {
         headers: { 'x-api-key': process.env.SHOTSTACK_API_KEY }
       });
       const data = await pollRes.json();
