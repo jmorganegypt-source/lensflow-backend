@@ -27,7 +27,7 @@ export async function runLensFlowPipeline(listingUrl) {
         const listing = await withRetry(() => scrapeListing(listingUrl), "Scrape");
         const script = await withRetry(() => generateScript(listing), "Script");
         const audioUrl = await withRetry(() => generateVoiceover(script), "Voiceover");
-        const presenterUrl = await withRetry(() => generatePresenter(script), "Presenter");
+        const presenterUrl = await withRetry(() => generatePresenter(script, audioUrl), "Presenter");
         const finalVideoUrl = await withRetry(() => composeVideo(presenterUrl, audioUrl, listing), "Final Render");
         console.log(`\n🎉 SUCCESS! Video Ready`);
         return { success: true, videoUrl: finalVideoUrl };
