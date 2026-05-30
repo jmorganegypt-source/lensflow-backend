@@ -17,8 +17,11 @@ export async function generatePresenter(script, audioUrl, presenter = 'mia') {
             avatar_style: 'normal'
           },
           voice: {
-            type: 'audio',
-            audio_url: audioUrl
+            type: 'text',
+            input_text: script,
+            voice_id: presenter === 'oliver'
+              ? '6be73833ef9a4eb0aeee399b8fe9d62b'
+              : '4754e1ec667544b0bd18cdf4bec7d6a7'
           }
         }],
         dimension: { width: 1080, height: 1920 }
